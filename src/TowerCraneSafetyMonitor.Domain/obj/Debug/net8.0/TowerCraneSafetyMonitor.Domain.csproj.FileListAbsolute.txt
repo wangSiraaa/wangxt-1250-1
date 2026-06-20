@@ -1,0 +1,5 @@
+/Users/mingyuan/workspace/sihuo/wangxtw3/1250/src/TowerCraneSafetyMonitor.Domain/obj/Debug/net8.0/TowerCraneSafetyMonitor.Domain.GeneratedMSBuildEditorConfig.editorconfig
+/Users/mingyuan/workspace/sihuo/wangxtw3/1250/src/TowerCraneSafetyMonitor.Domain/obj/Debug/net8.0/TowerCraneSafetyMonitor.Domain.AssemblyInfoInputs.cache
+/Users/mingyuan/workspace/sihuo/wangxtw3/1250/src/TowerCraneSafetyMonitor.Domain/obj/Debug/net8.0/TowerCraneSafetyMonitor.Domain.AssemblyInfo.cs
+/Users/mingyuan/workspace/sihuo/wangxtw3/1250/src/TowerCraneSafetyMonitor.Domain/obj/Debug/net8.0/TowerCraneSafetyMonitor.Domain.csproj.CoreCompileInputs.cache
+/Users/mingyuan/workspace/sihuo/wangxtw3/1250/src/TowerCraneSafetyMonitor.Domain/obj/Debug/net8.0/TowerCraneSafetyMonitor.Domain.sourcelink.json
