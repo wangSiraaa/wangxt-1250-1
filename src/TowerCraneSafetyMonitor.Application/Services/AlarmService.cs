@@ -115,7 +115,7 @@ public class AlarmService : IAlarmService
         return alarm;
     }
 
-    public async Task<Alarm> ResolveAsync(int alarmId, string action, string remarks, bool requiresRectification)
+    public async Task<Alarm> ResolveAsync(int alarmId, string action, string remarks, bool requiresRectification, DateTime? expectedRectificationTime)
     {
         var alarm = await _context.Alarms.FindAsync(alarmId);
         if (alarm == null) throw new KeyNotFoundException($"报警不存在");
@@ -127,6 +127,7 @@ public class AlarmService : IAlarmService
         alarm.HandleAction = action;
         alarm.HandleRemarks = remarks;
         alarm.RequiresRectification = requiresRectification;
+        alarm.ExpectedRectificationTime = expectedRectificationTime;
         if (!alarm.ProcessStartTime.HasValue)
             alarm.ProcessStartTime = DateTime.Now;
 
@@ -161,6 +162,8 @@ public class AlarmService : IAlarmService
         {
             var dueHours = alarm.AlarmLevel == AlarmLevel.Critical ? 24 :
                            alarm.AlarmLevel == AlarmLevel.Warning ? 48 : 72;
+            var defaultDueDate = DateTime.Now.AddHours(dueHours);
+            var finalDueDate = expectedRectificationTime ?? defaultDueDate;
             var rectification = new Rectification
             {
                 RectificationNo = GenerateRectificationNo(),
@@ -176,8 +179,8 @@ public class AlarmService : IAlarmService
                            alarm.AlarmLevel == AlarmLevel.Warning ? RectificationPriority.High :
                            RectificationPriority.Medium,
                 Status = RectificationStatus.Open,
-                Deadline = DateTime.Now.AddHours(dueHours),
-                DueDate = DateTime.Now.AddHours(dueHours),
+                Deadline = finalDueDate,
+                DueDate = finalDueDate,
                 Remarks = "整改期间该塔吊仅允许执行低风险任务"
             };
             _context.Rectifications.Add(rectification);

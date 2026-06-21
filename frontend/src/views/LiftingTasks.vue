@@ -257,6 +257,12 @@
             </template>
           </el-table-column>
           <el-table-column label="描述" prop="description" show-overflow-tooltip />
+          <el-table-column label="预计整改时间" width="160">
+            <template #default="{ row }">
+              <span v-if="row.expectedRectificationTime">{{ formatDateTime(row.expectedRectificationTime) }}</span>
+              <span v-else>—</span>
+            </template>
+          </el-table-column>
           <el-table-column label="时间" width="160">
             <template #default="{ row }">{{ formatDateTime(row.alarmTime) }}</template>
           </el-table-column>
@@ -266,6 +272,28 @@
             </template>
           </el-table-column>
         </el-table>
+
+        <el-divider>关联整改（{{ currentTask.towerCrane?.rectifications?.length || 0 }}）</el-divider>
+        <el-table :data="currentTask.towerCrane?.rectifications || []" size="small" stripe v-if="currentTask.towerCrane?.rectifications?.length">
+          <el-table-column label="整改单号" prop="rectificationNo" width="140" />
+          <el-table-column label="标题" prop="title" show-overflow-tooltip />
+          <el-table-column label="状态" width="90" align="center">
+            <template #default="{ row }">
+              <el-tag :type="getRectificationStatusType(row.status)" size="small">{{ getRectificationStatusLabel(row.status) }}</el-tag>
+            </template>
+          </el-table-column>
+          <el-table-column label="整改期限" width="160">
+            <template #default="{ row }">{{ formatDateTime(row.dueDate) }}</template>
+          </el-table-column>
+          <el-table-column label="是否超期" width="90" align="center">
+            <template #default="{ row }">
+              <el-tag v-if="row.isOverdue" type="danger" size="small">已超期</el-tag>
+              <el-tag v-else-if="row.status !== 4" type="success" size="small">正常</el-tag>
+              <span v-else style="color:#909399">—</span>
+            </template>
+          </el-table-column>
+        </el-table>
+        <el-empty v-else description="暂无整改记录" :image-size="60" />
       </div>
     </el-drawer>
   </div>
@@ -280,7 +308,7 @@ import api from '@/api'
 import { useAppStore } from '@/store/app'
 import type { LiftingTask, TowerCrane, Person } from '@/api'
 import {
-  TaskStatusMap, TaskRiskLevelMap, AlarmTypeMap, AlarmLevelMap, AlarmStatusMap
+  TaskStatusMap, TaskRiskLevelMap, AlarmTypeMap, AlarmLevelMap, AlarmStatusMap, RectificationStatusMap
 } from '@/utils/enumMaps'
 
 const appStore = useAppStore()
@@ -334,6 +362,9 @@ const filteredTasks = computed(() => {
 })
 
 const formatDateTime = (d: string) => dayjs(d).format('YYYY-MM-DD HH:mm')
+
+const getRectificationStatusLabel = (status: number) => RectificationStatusMap[status]?.label || '未知'
+const getRectificationStatusType = (status: number) => RectificationStatusMap[status]?.type || 'info'
 
 const getTaskStep = (task: LiftingTask) => {
   switch (task.status) {

@@ -114,7 +114,7 @@ public class AlarmsController : ControllerBase
     {
         try
         {
-            return Ok(await _service.ResolveAsync(id, request.Action, request.Remarks, request.RequiresRectification));
+            return Ok(await _service.ResolveAsync(id, request.Action, request.Remarks, request.RequiresRectification, request.ExpectedRectificationTime));
         }
         catch (KeyNotFoundException)
         {
@@ -153,5 +153,5 @@ public class AlarmsController : ControllerBase
 }
 
 public record HandlerRequest(int HandledById);
-public record ResolveAlarmRequest(string Action, string Remarks, bool RequiresRectification);
+public record ResolveAlarmRequest(string Action, string Remarks, bool RequiresRectification, DateTime? ExpectedRectificationTime);
 public record IgnoreAlarmRequest(int HandledById, string Reason);

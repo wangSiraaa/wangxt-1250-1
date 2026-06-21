@@ -121,6 +121,7 @@ public class Alarm
     public string? HandleAction { get; set; }
     public string? HandleRemarks { get; set; }
     public bool RequiresRectification { get; set; }
+    public DateTime? ExpectedRectificationTime { get; set; }
     public bool BlocksLiftingOperation => 
         (AlarmType == AlarmType.Overload || AlarmType == AlarmType.RangeLimit || AlarmType == AlarmType.HeightLimit)
         && Status != AlarmStatus.Resolved;
@@ -162,6 +163,7 @@ public class Rectification
     public string? ReviewResult { get; set; }
     public string? Remarks { get; set; }
     public bool RestrictsHighRiskTasks => Status != RectificationStatus.Closed;
+    public bool IsOverdue => Status != RectificationStatus.Closed && DueDate < DateTime.Now;
 
     public TowerCrane? TowerCrane { get; set; }
     public Alarm? Alarm { get; set; }

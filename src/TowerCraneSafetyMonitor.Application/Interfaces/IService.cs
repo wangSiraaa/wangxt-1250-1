@@ -58,7 +58,7 @@ public interface IAlarmService
     Task<IEnumerable<Alarm>> GetPendingAlarmsAsync();
     Task<Alarm> CreateAsync(Alarm alarm);
     Task<Alarm> StartProcessingAsync(int alarmId, int handledById);
-    Task<Alarm> ResolveAsync(int alarmId, string action, string remarks, bool requiresRectification);
+    Task<Alarm> ResolveAsync(int alarmId, string action, string remarks, bool requiresRectification, DateTime? expectedRectificationTime);
     Task<Alarm> IgnoreAsync(int alarmId, int handledById, string reason);
     Task<List<Alarm>> GetBlockingAlarmsForTaskAsync(int liftingTaskId);
     Task<List<Alarm>> GetBlockingAlarmsForTowerCraneAsync(int towerCraneId);

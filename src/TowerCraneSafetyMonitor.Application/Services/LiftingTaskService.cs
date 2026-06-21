@@ -37,6 +37,7 @@ public class LiftingTaskService : ILiftingTaskService
     {
         return await _context.LiftingTasks
             .Include(t => t.TowerCrane)
+                .ThenInclude(tc => tc.Rectifications)
             .Include(t => t.SafetyOfficer)
             .Include(t => t.Driver)
             .Include(t => t.Alarms)

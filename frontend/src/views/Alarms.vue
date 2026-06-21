@@ -172,6 +172,15 @@
             （将自动生成整改单，整改期间塔吊仅允许低风险任务）
           </span>
         </el-form-item>
+        <el-form-item v-if="requiresRectification" label="预计整改完成时间" required>
+          <el-date-picker
+            v-model="resolveForm.expectedRectificationTime"
+            type="datetime"
+            placeholder="选择预计整改完成时间"
+            value-format="YYYY-MM-DDTHH:mm:ss"
+            style="width:100%"
+          />
+        </el-form-item>
       </el-form>
 
       <template #footer>
@@ -228,7 +237,7 @@ const requiresRectification = ref(false)
 
 const supervisors = computed<Person[]>(() => appStore.persons.filter(p => p.role === 3 && p.isActive))
 
-const resolveForm = reactive({ action: '', remarks: '', handledById: undefined as number | undefined })
+const resolveForm = reactive({ action: '', remarks: '', handledById: undefined as number | undefined, expectedRectificationTime: '' as string | undefined })
 const ignoreForm = reactive({ handledById: undefined as number | undefined, reason: '' })
 
 const filteredAlarms = computed(() => {
@@ -279,7 +288,15 @@ const resolveAlarm = async (alarm: Alarm) => {
   if (!supervisors.value.length) await appStore.fetchPersons()
   currentAlarm.value = alarm
   requiresRectification.value = alarm.alarmLevel === 3 || alarm.alarmType === 1
-  Object.assign(resolveForm, { action: '', remarks: '', handledById: undefined })
+  const defaultDueHours = alarm.alarmLevel === 3 ? 24 : alarm.alarmLevel === 2 ? 48 : 72
+  Object.assign(resolveForm, {
+    action: '',
+    remarks: '',
+    handledById: undefined,
+    expectedRectificationTime: requiresRectification.value
+      ? dayjs().add(defaultDueHours, 'hour').format('YYYY-MM-DDTHH:mm:ss')
+      : ''
+  })
   resolveDialogVisible.value = true
 }
 
@@ -288,13 +305,18 @@ const confirmResolve = async () => {
     ElMessage.warning('请填写完整信息')
     return
   }
+  if (requiresRectification.value && !resolveForm.expectedRectificationTime) {
+    ElMessage.warning('需要整改时请填写预计整改完成时间')
+    return
+  }
   resolving.value = true
   try {
     await api.alarms.resolve(
       currentAlarm.value!.id,
       resolveForm.action,
       resolveForm.remarks,
-      requiresRectification.value
+      requiresRectification.value,
+      requiresRectification.value ? resolveForm.expectedRectificationTime : null
     )
     ElMessage.success({
       message: requiresRectification.value ? '已解决，整改单已自动生成' : '报警已解决',

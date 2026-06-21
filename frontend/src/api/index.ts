@@ -104,6 +104,7 @@ export interface Alarm {
   handleAction?: string | null
   handleRemarks?: string | null
   requiresRectification: boolean
+  expectedRectificationTime?: string | null
   blocksLiftingOperation?: boolean
   towerCrane?: TowerCrane
   liftingTask?: LiftingTask
@@ -141,6 +142,7 @@ export interface Rectification {
   reviewResult?: string | null
   remarks?: string | null
   restrictsHighRiskTasks?: boolean
+  isOverdue?: boolean
   towerCrane?: TowerCrane
   sourceAlarm?: Alarm
   alarm?: Alarm
@@ -303,8 +305,8 @@ const api = {
       request.post('/alarms', data),
     startProcessing: (id: number, handledById: number): Promise<AxiosResponse<Alarm>> =>
       request.post(`/alarms/${id}/start-processing`, { handledById }),
-    resolve: (id: number, action: string, remarks: string, requiresRectification: boolean): Promise<AxiosResponse<Alarm>> =>
-      request.post(`/alarms/${id}/resolve`, { action, remarks, requiresRectification }),
+    resolve: (id: number, action: string, remarks: string, requiresRectification: boolean, expectedRectificationTime?: string | null): Promise<AxiosResponse<Alarm>> =>
+      request.post(`/alarms/${id}/resolve`, { action, remarks, requiresRectification, expectedRectificationTime }),
     ignore: (id: number, handledById: number, reason: string): Promise<AxiosResponse<Alarm>> =>
       request.post(`/alarms/${id}/ignore`, { handledById, reason })
   },
